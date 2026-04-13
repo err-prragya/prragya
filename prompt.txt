@@ -1,0 +1,15 @@
+<question>
+        <title></title>
+        <options>
+            <option id="A"></option>
+            <option id="B"></option>
+            <option id="C"></option>
+            <option id="D"></option>
+        </options>
+        <board></board>
+        <year></year>
+    </question>
+
+
+in the avobe structured xml format organise the questions.Ignore question indexs,you dont need to add them.
+

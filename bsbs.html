@@ -1,0 +1,86 @@
+<style type="text/css" media="all">
+  *{
+    margin: 0;
+  }
+  
+  img{
+    width:150px;
+    height:200px;
+    
+  }
+</style>
+
+<img id="char1" />
+<img id="char2" />
+<img id="char3" />
+<img id="char4" />
+<img id="char5" />
+<img id="char6" />
+<img id="char7" />
+<img id="char8" />
+<img id="char9" />
+<img id="char10" />
+<img id="char11" />
+<img id="char12" />
+
+
+<script>
+  function wait(ms) {
+  return new Promise(res => setTimeout(res, ms));
+}
+
+// single character animation
+async function startTimedAnimation(imgElement, frames, loop = true) {
+  let i = 0;
+  
+  while (true) {
+    const [url, seconds] = frames[i];
+    
+    imgElement.src = url;
+    
+    await wait(seconds * 1000);
+    
+    i++;
+    
+    if (i >= frames.length) {
+      if (loop) i = 0;
+      else break;
+    }
+  }
+}
+
+// helper: build frames automatically from folder
+function buildFrames(characterName) {
+  const base = `/characters/${characterName}/`;
+  return [
+    [base + "a.png", 2],
+    [base + "b.png", 0.15],
+    [base + "c.png", 0.15],
+    [base + "b.png", 0.15]
+  ];
+}
+
+
+// start all 12 animations
+const characters = [
+  "anupom",
+  "anupoms_mama",
+  "anupoms_mother",
+  "binu_dada",
+  "british_man",
+  "harish",
+  "hindustani_servant",
+  "kallani",
+  "rabindranath_tagore",
+  "shambhunath_sen",
+  "shambhunath_sens_friend",
+  "station_master"
+];
+
+characters.forEach((name, index) => {
+  const img = document.getElementById("char" + (index + 1));
+  const frames = buildFrames(name);
+  
+  startTimedAnimation(img, frames, true);
+});
+</script>

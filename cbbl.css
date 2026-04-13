@@ -1,0 +1,75 @@
+.cbbl {
+  position: fixed;
+  display: inline-block;
+  
+ 
+  background-color: #F1C190;
+  color: #2B283B;
+  
+  box-shadow: 0 -3px #F1C190, 0 -6px #2B283B, 3px 0 #F1C190, 3px -3px #2B283B, 6px 0 #2B283B, 0 3px #F1C190, 0 6px #2B283B, -3px 0 #F1C190, -3px 3px #2B283B, -6px 0 #2B283B, -3px -3px #2B283B, 3px 3px #2B283B, 3px 9px #D1816A, 6px 6px #D1816A, 9px 3px #D1816A;
+  
+  box-sizing: border-box;
+}
+.cbbl::before,
+.cbbl::after {
+  content: '';
+  display: block;
+  position: absolute;
+  box-sizing: border-box;
+  left: 20%;
+}
+.cbbl::after {
+  background: #F1C190;
+  width: 9px;
+  height: 3px;
+  bottom: -14px;
+  margin-left: 0px;
+  
+  box-shadow: -3px 0 #2B283B, 3px 0 #2B283B, -3px 3px #F1C190, -6px 3px #2B283B, 0px 3px #2B283B, 3px 3px #D1816A, -6px 6px #2B283B, -3px 6px #2B283B, 0px 6px #D1816A, -3px 9px #D1816A;
+  
+}
+.cbbl::before {
+  width: 15px;
+  height: 8px;
+  background: #F1C190 ;
+  bottom: -11px;
+  border-left: 3px solid #2B283B;
+  border-right: 3px solid #2B283B;
+}
+
+
+.cbbl.-up {
+  margin: 29px 9px 10px 6px;
+}
+.cbbl.-up::before {
+  top: -11px;
+  bottom: auto;
+}
+.cbbl.-up::after {
+  top: -14px;
+  bottom: auto;
+  box-shadow: -3px 0 #2B283B, 3px 0 #2B283B, 3px -3px #fff, 0px -3px #2B283B, 6px -3px #2B283B, 3px -6px #2B283B, 6px -6px #2B283B;
+}
+.cbbl.-up.-hover:hover::after {
+  box-shadow: -3px 0 #7bc8a4, 3px 0 #7bc8a4, 3px -3px #eee, 0px -3px #7bc8a4, 6px -3px #7bc8a4, 3px -6px #7bc8a4, 6px -6px #7bc8a4;
+}
+.cbbl.-up.-right::after {
+  box-shadow: 3px 0 #2B283B, -3px 0 #2B283B, -3px -3px #fff, 0px -3px #2B283B, -6px -3px #2B283B, -3px -6px #2B283B, -6px -6px #2B283B;
+}
+.cbbl.-up.-right.-hover:hover::after {
+  box-shadow: 3px 0 #7bc8a4, -3px 0 #7bc8a4, -3px -3px #eee, 0px -3px #7bc8a4, -6px -3px #7bc8a4, -3px -6px #7bc8a4, -6px -6px #7bc8a4;
+}
+.cbbl.-right::before,
+.cbbl.-right::after {
+  left: auto;
+  right: 20%;
+}
+.cbbl.-right::after {
+  margin-left: 0;
+  margin-right: 6px;
+  box-shadow: 3px 0 #2B283B, -3px 0 #2B283B, -3px 3px #fff, 0px 3px #2B283B, -6px 3px #2B283B, -3px 6px #2B283B, -6px 6px #2B283B, -3px 9px #D1816A, 0 6px #D1816A, 3px 3px #D1816A, 6px 0px #D1816A;
+}
+
+
+
+

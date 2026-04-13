@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background: #111;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── FILE PICKER ── */
+  .file-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .file-label {
+    cursor: pointer;
+    background: #F5C518;
+    color: #1B3A6B;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    padding: 8px 16px;
+    border-radius: 999px;
+    transition: opacity 0.2s;
+  }
+  .file-label:hover { opacity: 0.85; }
+  .file-label input { display: none; }
+  .file-name {
+    font-size: 10px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.04em;
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── ISLAND ── */
+  .island {
+    width: 300px;
+    background: #F5C518;
+    border-radius: 28px;
+    padding: 9px 11px;
+    overflow: hidden;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .play-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: #1B3A6B;
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.15s;
+  }
+  .play-btn:active { transform: scale(0.92); }
+  .play-btn svg { width: 14px; height: 14px; fill: #F5C518; }
+
+  .prog {
+    flex: 1;
+    cursor: pointer;
+    padding: 8px 0;
+  }
+  .track {
+    height: 3px;
+    background: rgba(27,58,107,0.18);
+    border-radius: 999px;
+    position: relative;
+  }
+  .fill {
+    height: 100%;
+    width: 0%;
+    background: #1B3A6B;
+    border-radius: 999px;
+    position: relative;
+    transition: width 0.1s linear;
+  }
+  .fill::after {
+    content:'';
+    position: absolute;
+    right: -5px; top: 50%;
+    transform: translateY(-50%);
+    width: 10px; height: 10px;
+    background: #1B3A6B;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .prog:hover .fill::after { opacity: 1; }
+
+  .expand-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(27,58,107,0.12);
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .expand-btn:hover { background: rgba(27,58,107,0.2); }
+  .expand-btn svg {
+    width: 13px; height: 13px;
+    fill: none;
+    stroke: #1B3A6B;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.45s cubic-bezier(0.4,0,0.2,1);
+  }
+  .island.expanded .expand-btn svg { transform: rotate(180deg); }
+
+  /* lyrics panel */
+  .lyrics-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    margin-top: 0;
+    transition:
+      grid-template-rows 0.4s ease,
+      opacity            0.35s ease,
+      margin-top         0.4s ease;
+  }
+  .lyrics-panel-inner { overflow: hidden; }
+  .island.expanded .lyrics-panel {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    margin-top: 12px;
+  }
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .track-title {
+    font-size: 12px;
+    font-weight: 400;
+    color: #1B3A6B;
+    letter-spacing: 0.03em;
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .times {
+    font-size: 10px;
+    font-weight: 300;
+    color: rgba(27,58,107,0.5);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .sep {
+    height: 1px;
+    background: rgba(27,58,107,0.14);
+    margin-bottom: 11px;
+  }
+
+  .lyric-line {
+    font-size: 11px;
+    font-weight: 300;
+    line-height: 1.95;
+    color: rgba(27,58,107,0.3);
+    transition: color 0.3s, transform 0.3s;
+  }
+  .lyric-line.past   { color: rgba(27,58,107,0.5); }
+  .lyric-line.active { color: #1B3A6B; font-weight: 400; transform: translateX(3px); }
+</style>
+</head>
+<body>
+
+<!-- File picker -->
+<div class="file-area">
+  <label class="file-label">
+    <input type="file" id="fileInput" accept="audio/*">
+    pick audio
+  </label>
+  <span class="file-name" id="fileName">no file chosen</span>
+</div>
+
+<!-- Player -->
+<div class="island" id="island">
+  <div class="row">
+    <button class="play-btn" id="playBtn">
+      <svg viewBox="0 0 24 24" id="playIcon"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <div class="prog" id="prog">
+      <div class="track"><div class="fill" id="fill"></div></div>
+    </div>
+    <button class="expand-btn" id="expandBtn">
+      <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+  </div>
+
+  <div class="lyrics-panel">
+    <div class="lyrics-panel-inner">
+      <div class="meta-row">
+        <span class="track-title" id="trackTitle">—</span>
+        <span class="times"><span id="timeCurrent">0:00</span> / <span id="timeTotal">0:00</span></span>
+      </div>
+      <div class="sep"></div>
+      <div class="lyric-line past">Underneath the city lights</div>
+      <div class="lyric-line past">Where the night turns electric blue</div>
+      <div class="lyric-line active">I've been searching all my life</div>
+      <div class="lyric-line">For a frequency like you</div>
+      <div class="lyric-line">Every signal fades to static</div>
+      <div class="lyric-line">But yours cuts through the dark</div>
+      <div class="lyric-line">Gold and burning, automatic</div>
+    </div>
+  </div>
+</div>
+
+<audio id="audio" src="/musics/oporichita/bhirer_majhe_ochena.mp3"></audio>
+
+<script>
+  const audio      = document.getElementById('audio');
+  const fileInput  = document.getElementById('fileInput');
+  const fileName   = document.getElementById('fileName');
+  const island     = document.getElementById('island');
+  const playBtn    = document.getElementById('playBtn');
+  const playIcon   = document.getElementById('playIcon');
+  const fill       = document.getElementById('fill');
+  const prog       = document.getElementById('prog');
+  const expandBtn  = document.getElementById('expandBtn');
+  const trackTitle = document.getElementById('trackTitle');
+  const timeCurrent= document.getElementById('timeCurrent');
+  const timeTotal  = document.getElementById('timeTotal');
+  const lines      = document.querySelectorAll('.lyric-line');
+
+  const PLAY  = 'M8 5v14l11-7z';
+  const PAUSE = 'M6 19h4V5H6v14zm8-14v14h4V5h-4z';
+
+  function fmt(s) {
+    if (!s || isNaN(s)) return '0:00';
+    return `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+  }
+
+  // Load file
+  fileInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    audio.src = URL.createObjectURL(file);
+    // strip extension for title
+    trackTitle.textContent = file.name.replace(/\.[^.]+$/, '');
+    fileName.textContent = file.name;
+    audio.load();
+  });
+
+  // Duration ready
+  audio.addEventListener('loadedmetadata', () => {
+    timeTotal.textContent = fmt(audio.duration);
+  });
+
+  // Play / pause
+  playBtn.addEventListener('click', () => {
+    if (!audio.src) return;
+    if (audio.paused) {
+      audio.play();
+      playIcon.querySelector('path').setAttribute('d', PAUSE);
+    } else {
+      audio.pause();
+      playIcon.querySelector('path').setAttribute('d', PLAY);
+    }
+  });
+
+  audio.addEventListener('ended', () => {
+    playIcon.querySelector('path').setAttribute('d', PLAY);
+  });
+
+  // Sync progress bar & time
+  audio.addEventListener('timeupdate', () => {
+    if (!audio.duration) return;
+    const pct = (audio.currentTime / audio.duration) * 100;
+    fill.style.width = pct + '%';
+    timeCurrent.textContent = fmt(audio.currentTime);
+
+    // Sync lyric highlight
+    const idx = Math.floor((pct / 100) * lines.length);
+    lines.forEach((l, i) => {
+      l.classList.remove('active','past');
+      if (i < idx) l.classList.add('past');
+      else if (i === idx) l.classList.add('active');
+    });
+  });
+
+  // Seek on click
+  prog.addEventListener('click', e => {
+    if (!audio.duration) return;
+    const r = prog.getBoundingClientRect();
+    audio.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * audio.duration;
+  });
+
+  // Expand
+  expandBtn.addEventListener('click', () => island.classList.toggle('expanded'));
+</script>
+</body>
+</html>

@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Midnight Train</title>
+  <link rel="stylesheet" href="cbbl.css">
+  
+  
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* ── ISLAND ── */
+    .island {
+      position: fixed;
+      z-index: 192939;
+      width: 300px;
+      background: #F5C518;
+      border-radius: 28px;
+      padding: 9px 11px;
+      overflow: hidden;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 30px;
+    }
+    
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    
+    .play-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #1B3A6B;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.15s;
+    }
+    
+    .play-btn:active {
+      transform: scale(0.92);
+    }
+    
+    .play-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: #F5C518;
+    }
+    
+    .prog {
+      flex: 1;
+      cursor: pointer;
+      padding: 8px 0;
+    }
+    
+    .track {
+      height: 3px;
+      background: rgba(27, 58, 107, 0.18);
+      border-radius: 999px;
+      position: relative;
+    }
+    
+    .fill {
+      height: 100%;
+      width: 0%;
+      background: #1B3A6B;
+      border-radius: 999px;
+      position: relative;
+      transition: width 0.1s linear;
+    }
+    
+    .fill::after {
+      content: '';
+      position: absolute;
+      right: -5px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 10px;
+      height: 10px;
+      background: #1B3A6B;
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    
+    .prog:hover .fill::after {
+      opacity: 1;
+    }
+    
+    .expand-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(27, 58, 107, 0.12);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    
+    .expand-btn:hover {
+      background: rgba(27, 58, 107, 0.2);
+    }
+    
+    .expand-btn svg {
+      width: 13px;
+      height: 13px;
+      fill: none;
+      stroke: #1B3A6B;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .island.expanded .expand-btn svg {
+      transform: rotate(180deg);
+    }
+    
+    /* lyrics panel */
+    .lyrics-panel {
+      
+      
+      display: grid;
+      grid-template-rows: 0fr;
+      opacity: 0;
+      margin-top: 0;
+      transition:
+        grid-template-rows 0.4s ease,
+        opacity 0.35s ease,
+        margin-top 0.4s ease;
+    }
+    
+    .lyrics-panel-inner {
+      overflow: hidden;
+      text-align: center;
+      
+    }
+    
+    
+    .island.expanded .lyrics-panel {
+      grid-template-rows: 1fr;
+      opacity: 1;
+      margin-top: 12px;
+      
+    }
+    
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+    
+    .track-title {
+      font-size: 12px;
+      font-weight: 400;
+      color: #1B3A6B;
+      letter-spacing: 0.03em;
+      max-width: 160px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .times {
+      font-size: 10px;
+      font-weight: 300;
+      color: rgba(27, 58, 107, 0.5);
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+    
+    .sep {
+      height: 1px;
+      background: rgba(27, 58, 107, 0.14);
+      margin-bottom: 11px;
+    }
+    
+    .lyric-line {
+      margin: 0;
+      padding: 0;
+      
+      font-size: 12px;
+      font-weight: 300;
+      line-height: 1.25;
+      color: rgba(27, 58, 107, 0.3);
+      transition: color 0.3s, transform 0.3s;
+    }
+    
+    .lyric-line.past {
+      color: rgba(27, 58, 107, 0.5);
+    }
+    
+    .lyric-line.active {
+      color: #1B3A6B;
+      font-weight: 400;
+      transform: translateX(3px);
+    }
+  </style>
+  
+  
+  <style>
+    ::selection {
+      background: yellow;
+      /* highlight background color */
+      color: blue;
+      z-index: 6666666;
+      /* selected text color */
+    }
+    
+    * {
+      scrollbar-width: none;
+      /* Firefox */
+      -ms-overflow-style: none;
+      /* Old Edge */
+    }
+    
+    *::-webkit-scrollbar {
+      display: none;
+      /* Chrome, Safari, Edge */
+    }
+    
+    
+    @font-face {
+      font-family: 'nor';
+      src: url('nor.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    
+    @font-face {
+      font-family: 'itl';
+      src: url('itl.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html,
+    body {
+      font-family: "nor";
+      width: 100%;
+      height: 100%;
+      overflow: scroll;
+      background: url('scene.png') bottom center / cover no-repeat;
+      
+    }
+    
+    
+    
+    /* Dreamy overlay layers */
+    .dream-veil {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(to bottom, blue 80%, red);
+      opacity: 0.3;
+      mix-blend-mode: darken;
+      pointer-events: none;
+      z-index: 1;
+      
+    }
+    
+    
+    
+    
+    
+    
+    .moon-glow {
+      position: fixed;
+      bottom: 62%;
+      right: 3%;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, 0%, rgba(200, 220, 255, 0.07) 50%, transparent 75%);
+      animation: moonPulse 4s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 2;
+      b
+    }
+    
+    @keyframes moonPulse {
+      
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+      
+      50% {
+        transform: scale(1.12);
+        opacity: 1;
+      }
+    }
+    
+    /* ── FIREFLIES ─────────────────────────────────────────────── */
+    .firefly-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+    }
+    
+    .firefly {
+      position: absolute;
+      width: 1.5px;
+      height: 1.5px;
+      image-rendering: pixelated;
+      animation:
+        fireflyBlink var(--blink-dur, 2s) var(--blink-delay, 0s) ease-in-out infinite,
+        fireflyDrift var(--drift-dur, 20s) var(--drift-delay, 0s) linear infinite;
+    }
+    
+    @keyframes fireflyBlink {
+      
+      0%,
+      100% {
+        opacity: 0;
+      }
+      
+      50% {
+        opacity: var(--max-alpha, 0.9);
+      }
+    }
+    
+    @keyframes fireflyDrift {
+      0% {
+        transform: translate(0, 0);
+      }
+      
+      25% {
+        transform: translate(var(--dx1, 64px), var(--dy1, -12px));
+      }
+      
+      50% {
+        transform: translate(var(--dx2, -40px), var(--dy2, 20px));
+      }
+      
+      75% {
+        transform: translate(var(--dx3, 96px), var(--dy3, 8px));
+      }
+      
+      100% {
+        transform: translate(0, 0);
+      }
+    }
+    
+    /* ── DUST MOTES ────────────────────────────────────────────── */
+    .mote-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+    }
+    
+    .mote {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(200, 220, 255, var(--base-alpha, 0.18));
+      animation:
+        moteRise var(--rise-dur, 18s) var(--rise-delay, 0s) linear infinite,
+        moteSway var(--sway-dur, 5s) var(--sway-delay, 0s) ease-in-out infinite,
+        moteFade var(--fade-dur, 4s) var(--fade-delay, 0s) ease-in-out infinite;
+    }
+    
+    @keyframes moteRise {
+      from {
+        transform: translateY(0);
+      }
+      
+      to {
+        transform: translateY(calc(-1 * var(--rise-dist, 100vh)));
+      }
+    }
+    
+    @keyframes moteSway {
+      
+      0%,
+      100% {
+        margin-left: 0;
+      }
+      
+      50% {
+        margin-left: var(--sway-amp, 6px);
+      }
+    }
+    
+    @keyframes moteFade {
+      
+      0%,
+      100% {
+        opacity: 0.15;
+      }
+      
+      50% {
+        opacity: var(--max-alpha, 0.35);
+      }
+    }
+    
+    
+    .xyz {
+      color: #B6BCFF;
+      z-index: 2;
+      position: fixed;
+      overflow: scroll;
+      width: 80%;
+      margin: auto;
+      height: calc(100vh - 40px);
+      font-weight: lighter;
+      text-align: justify;
+      font-size: 12px;
+      bottom: 0%;
+      left: 50%;
+      transform: translateX(-50%);
+      
+      
+      
+      -webkit-mask-image: linear-gradient(to bottom, #DADAFF 80%, #DADAFF00);
+      mask-image: linear-gradient(to bottom, #DADAFF 80%, #DADAFF00);
+      /*
+      background: linear-gradient(to bottom, #DADAFF 80%, #DADAFF00);
+      
+ 
+      background-attachment: fixed;
+      
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      */
+    }
+    
+    
+    span.highlight {
+      background: #F5C518;
+      color: #1B3A6B;
+      padding: 0px 5px 0px 5px;
+      border-radius: 5px;
+    }
+    
+    
+    
+    .train {
+      position: fixed;
+      /* important: relative to screen */
+      z-index: 3;
+      bottom: 0.3%;
+      
+      
+      pointer-events: none;
+      width: 80vw;
+      
+      animation: moveAcross 7.5s ease-in infinite;
+      animation-delay: 0s;
+      
+      
+      
+    }
+    
+    
+    
+    
+    /* animation */
+    @keyframes moveAcross {
+      0% {
+        /*  left: 0%;*/
+        transform: translateX(-100vw);
+      }
+      
+      100% {
+        /*   left: 100%;*/
+        transform: translateX(100vw);
+      }
+    }
+    
+    
+    #track {
+      width: 100vw;
+      position: fixed;
+      bottom: 0px;
+      pointer-events: none;
+      
+    }
+    
+    #char_img_left {
+      filter: drop-shadow(0px 0px 10px white);
+      
+      
+      position: fixed;
+      z-index: 999999;
+      width: 150px;
+      top: 60%;
+      left: -100px;
+      
+      transition: left 0.5s ease;
+    }
+    
+    #char_img_left.show {
+      left: 0px;
+    }
+    
+    .cbbl {
+      position: fixed;
+      z-index: 999999984;
+      width: 80vw;
+      height: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 30%;
+      transition: 0.5s all ease;
+      opacity: 00;
+      pointer-events: none;
+    }
+    
+    .cbbl.show {
+      opacity: 1;
+      bottom: 42.5%;
+      pointer-events: auto;
+    }
+    
+    .cbbl div {
+      text-align: justify;
+      font-size: 12.5px;
+      line-height: 1.25;
+      height: 100%;
+      overflow: scroll;
+      padding: 10px;
+    }
+    
+    
+    
+    span.char {
+      background: #F5C51844;
+      color: white;
+      padding: 0px 5px;
+      border-radius: 5px;
+      border-bottom: 1px dashed #F5C518;
+      transition: 0.25s all ease;
+    }
+    
+    span.char:hover {
+      background: #F5C51888;
+      
+    }
+  </style>
+</head>
+
+<body>
+  
+  <div class="island" id="island">
+    <div class="row">
+      <button class="play-btn" id="playBtn">
+        <svg viewBox="0 0 24 24" id="playIcon">
+          <path d="M8 5v14l11-7z" />
+        </svg>
+      </button>
+      <div class="prog" id="prog">
+        <div class="track">
+          <div class="fill" id="fill"></div>
+        </div>
+      </div>
+      <button class="expand-btn" id="expandBtn">
+        <svg viewBox="0 0 24 24">
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+    </div>
+    
+    <div class="lyrics-panel">
+      <div class="lyrics-panel-inner">
+        <div class="meta-row">
+          <span class="track-title" id="trackTitle">অপরিচিতা তুমি</span>
+          <span class="times"><span id="timeCurrent">0:00</span> / <span id="timeTotal">0:00</span></span>
+        </div>
+        <div class="sep"></div>
+        
+        <div class="lyric-line" data-time="23">এই ব্যস্ত ভিড়ে, অচেনা এক মুখ,</div>
+        <div class="lyric-line" data-time="29">ভিড় ঠেলে হেঁটে যাওয়া, হালকা রোদ্দুর।</div>
+        <div class="lyric-line" data-time="34">চায়ের কাপে ধোঁয়া, জানালার ওপারে,</div>
+        <div class="lyric-line" data-time="39">কার সাথে কথা বলো, চেনা কি আদরে?</div>
+        
+        <div class="lyric-line" data-time="44">পথ চলতে চোখে পড়া, একজোড়া চোখ,</div>
+        <div class="lyric-line" data-time="50">নাম না জানা কারোর, থাকুক না শোক।</div>
+        <div class="lyric-line" data-time="55">অপরিচিতা তুমি, অজানা সে সুর,</div>
+        <div class="lyric-line" data-time="59">তবু কেন মনে হয়, কত কাছে দূর?</div>
+        
+        <div class="lyric-line" data-time="64">হয়তো বা দেখা হবে, অন্য কোনো ক্ষণে,</div>
+        <div class="lyric-line" data-time="69">এই শহরের ভিড়ে, চেনা আলাপনে।</div>
+        <div class="lyric-line" data-time="99">অপরিচিতা তুমি, অজানা সে সুর,</div>
+        <div class="lyric-line" data-time="104">তবু কেন মনে হয়, কত কাছে দূর?</div>
+        
+        <div class="lyric-line" data-time="109">হাতের ব্যাগে তোমার, পুরোনো সে বই,</div>
+        <div class="lyric-line" data-time="113">কোন লেখকের স্বপ্নে, তুমিও কি সই?</div>
+        <div class="lyric-line" data-time="118">হঠাৎ বাসের ব্রেক, কাঁধ ছুঁয়ে যায়,</div>
+        <div class="lyric-line" data-time="123">অজান্তে হাসি ফোটে, চেনা ভাবনায়।</div>
+        
+        <div class="lyric-line" data-time="129">সময় থমকে আছে, এইটুকু শুধু,</div>
+        <div class="lyric-line" data-time="133">নীরবতার ভাষায়, গড়েছো কি জাদু?</div>
+        <div class="lyric-line" data-time="138">ভিড় সরে যায়, তুমিও হারাও,</div>
+        <div class="lyric-line" data-time="144">হয়তো বা মনে মনে, গান গেয়ে যাও।</div>
+        
+        <div class="lyric-line" data-time="155">তবুও কি রেশ থাকে, ওই চোখে চোখে?</div>
+        <div class="lyric-line" data-time="164">অচেনা এ গল্প, থাক না আলোকে।</div>
+        <div class="lyric-line" data-time="">থাক না আলোকে... (অচেনা এ গল্প)।</div>
+        <h1>~</h1>
+      </div>
+    </div>
+  </div>
+  
+  <audio autoplay id="audio" src="/musics/oporichita/bhirer_majhe_ochena.mp3"></audio>
+  
+  <div class="cbbl" id="char_msg_a">
+    <div>
+      HDI হররোজ মনে হয় না তুমি এমন আমার মনে
+      
+      আমি নজরুল ইসলাম, আমার দিয়ে দিন পর দিন পর দিন কোনো ধরে নিয়ে কথা আমি আমার জন্য মনে হয় মনে হয় না তুমি এমন আমার মনে জন্য খায় না এটা কেন এমন পানি যে থেকে শুরু বের হবা পারে এমন হাদি
+    </div>
+  </div>
+  
+  <img src="" alt="" id="char_img_left" />
+  
+  
+  <img src="/images/oporichita/track.png" alt="" id="track" />
+  <img src="train.png" class="train" />
+  <div class="xyz">
+    <br><br><br><br>
+    <h1>অপরিচিতা</h1>
+    <h4><span onclick="toggleImg(this,'rabindranath_tagore')" class="char">রবীন্দ্রনাথ ঠাকুর</span></h4>
+    <br><br>
+    <p>
+      আজ <span onclick="toggleImg(this,'anupom')" class="char">আমার</span> বয়স সাতাশ মাত্র। এ জীবনটা না দৈর্ঘ্যের হিসাবে বড়ো, না গুণের হিসাবে। তবু ইহার একটু বিশেষ মূল্য আছে। ইহা সেই ফুলের মতো যাহার বুকের উপরে ভ্রমর আসিয়া বসিয়াছিল, এবং সেই পদক্ষেপের ইতিহাস তাহার জীবনের মাঝখানে ফলের মতো গুটি ধরিয়া উঠিয়াছে।
+      <br><br>
+      
+      সেই ইতিহাসটুকু আকারে ছোটো, তাহাকে ছোটো করিয়াই লিখিব। ছোটোকে যাঁহারা সামান্য বলিয়া ভুল করেন না তাঁহারা ইহার রস বুঝিবেন।
+      <br><br>
+      কলেজে যতগুলো পরীক্ষা পাস করিবার সব আমি চুকাইয়াছি। ছেলেবেলায় আমার সুন্দর চেহারা লইয়া পণ্ডিতমশায় আমাকে শিমুল ফুল ও মাকাল ফলের সহিত তুলনা করিয়া বিদ্রূপ করিবার সুযোগ পাইয়াছিলেন। ইহাতে তখন বড়ো লজ্জা পাইতাম; কিন্তু বয়স হইয়া এ কথা ভাবিয়াছি, যদি জন্মান্তর থাকে তবে আমার মুখে সুরূপ এবং পণ্ডিতমশায়দের মুখে বিদ্রূপ আবার যেন এমনি করিয়াই প্রকাশ পায়।
+      <br><br>
+      আমার পিতা এতকালে গরিব ছিলেন। ওকালতি করিয়া তিনি প্রচুর টাকা রোজগার করিয়াছেন, ভোগ করিবার সময় নিমেষমাত্রও পান নাই। মৃত্যুতে তিনি যে হাঁফ ছাড়িলেন, সেই তাঁর প্রথম অবকাশ।
+      <br><br>
+      আমার তখন বয়স অল্প। মার হাতেই আমি মানুষ। মা গরিবের ঘরের মেয়ে; তাই, আমরা যে ধনী এ কথা তিনিও ভোলেন না, আমাকেও ভুলিতে দেন না। শিশুকালে আমি কোলে কোলেই মানুষ-- বোধ করি, সেইজন্য শেষ পর্যন্ত আমার পুরাপুরি বয়সই হইল না। আজও আমাকে দেখিলে মনে হইবে, আমি অন্নপূর্ণার কোলে গজাননের ছোটো ভাইটি।
+      <br><br>
+      <span class="highlight">আমার আসল অভিভাবক আমার মামা।</span> তিনি আমার চেয়ে বড়োজোর বছর ছয়েক বড়ো। কিন্তু ফল্গুর বালির মতো তিনি আমাদের সমস্ত সংসারটাকে নিজের অন্তরের মধ্যে শুষিয়া লইয়াছেন। তাঁহাকে না খুঁড়িয়া এখানকার এক গণ্ডূষও রস পাইবার জো নাই। এই কারণে কোনো কিছুর জন্যই আমাকে কোনো ভাবনা ভাবিতে হয় না।
+      <br><br>
+      কন্যার পিতা মাত্রেই স্বীকার করিবেন, আমি সৎপাত্র। তামাকটুকু পর্যন্ত খাই না। ভালোমানুষ হওয়ার কোনো ঝঞ্ঝাট নাই, তাই আমি নিতান্ত ভালোমানুষ। মাতার আদেশ মানিয়া চলিবার ক্ষমতা আমার আছে-- বস্তুত না-মানিবার ক্ষমতা আমার নাই। অন্তঃপুরের শাসনে চলিবার মতো করিয়াই আমি প্রস্তুত হইয়াছি, যদি কোনো কন্যা স্বয়ম্বরা হন তবে এই সুলক্ষণটি স্মরণ রাখিবেন।
+      <br><br>
+      অনেক বড়ো ঘর হইতে আমার সম্বন্ধ আসিয়াছিল। কিন্তু মামা, যিনি পৃথিবীতে আমার ভাগ্যদেবতার প্রধান এজেণ্ট, বিবাহ সম্বন্ধে তাঁর একটা বিশেষ মত ছিল। ধনীর কন্যা তাঁর পছন্দ নয়। আমাদের ঘরে যে মেয়ে আসিবে সে মাথা হেঁট করিয়া আসিবে, এই তিনি চান। অথচ টাকার প্রতি আসক্তি তাঁর অস্থিমজ্জায় জড়িত। তিনি এমন বেহাই চান যাহার টাকা নাই অথচ যে টাকা দিতে কসুর করিবে না। যাহাকে শোষণ করা চলিবে অথচ বাড়িতে আসিলে গুড়গুড়ির পরিবর্তে বাঁধা হুঁকায় তামাক দিলে যাহার নালিশ খাটিবে না।
+      <br><br>
+      আমার বন্ধু হরিশ কানপুরে কাজ করে। সে ছুটিতে কলিকাতায় আসিয়া আমার মন উতলা করিয়া দিল। সে বলিল, 'ওহে, মেয়ে যদি বল একটা খাসা মেয়ে আছে।'
+      <br><br>
+      কিছুদিন পূর্বেই এম.এ. পাস করিয়াছি। সামনে যতদূর পর্যন্ত দৃষ্টি চলে ছুটি ধূ ধূ করিতেছে; পরীক্ষা নাই, উমেদারি নাই, চাকরি নাই; নিজের বিষয় দেখিবার চিন্তাও নাই, শিক্ষাও নাই, ইচ্ছাও নাই-- থাকিবার মধ্যে ভিতরে আছেন মা এবং বাহিরে আছেন মামা।
+      <br><br>
+      এই অবকাশের মরুভূমির মধ্যে আমার হৃদয় তখন বিশ্বব্যাপী নারীরূপের মরীচিকা দেখিতেছিল-- আকাশে তাহার দৃষ্টি, বাতাসে তাহার নিশ্বাস, তরুমর্মরে তাহার গোপন কথা।
+      <br><br>
+      এমন সময় হরিশ আসিয়া বলিল, 'মেয়ে যদি বল, তবে--'। আমার শরীর মন বসন্তবাতাসে বকুলবনের নবপল্লবরাশির মতো কাঁপিতে কাঁপিতে আলোছায়া ধুনিতে লাগিল। হরিশ মানুষটা ছিল রসিক, রস দিয়া বর্ণনা করিবার শক্তি তাহার ছিল, আর আমার মন ছিল তৃষার্ত।
+      <br><br>
+      আমি হরিশকে বলিলাম, 'একবার মামার কাছে কথাটা পাড়িয়া দেখো।'
+      <br><br>
+      হরিশ আসর জমাইতে অদ্বিতীয়। তাই সবর্ত্রই তাহার খাতির। মামাও তাহাকে পাইলে ছাড়িতে চান না। কথাটা তাঁর বৈঠকে উঠিল। মেয়ের চেয়ে মেয়ের বাপের খবরটাই তাঁহার কাছে গুরুতর। বাপের অবস্থা তিনি যেমনটি চান তেমনি। এককালে ইহাদের বংশে লক্ষ্মীর মঙ্গলঘট ভরা ছিল। এখন তাহা শূন্য বলিলেই হয়, অথচ তলায় সামান্য কিছু বাকি আছে। দেশে বংশমর্যাদা রাখিয়া চলা সহজ নয় বলিয়া ইনি পশ্চিমে গিয়া বাস করিতেছেন। সেখানে গরিব গৃহস্থের মতোই থাকেন। একটি মেয়ে ছাড়া তাঁর আর নাই। সুতরাং তাহারই পশ্চাতে লক্ষ্মীর ঘটটি একবারে উপুড় করিয়া দিতে দ্বিধা হইবে না।
+      <br><br>
+      এ-সব ভালো কথা। কিন্তু মেয়ের বয়স যে পনেরো, তাই শুনিয়া মামার মন ভার হইল। বংশে তো কোনো দোষ নাই? না, দোষ নাই-- বাপ কোথাও তাঁর মেয়ের যোগ্য বর খুঁজিয়া পান না। একে তো বরের হাট মহার্ঘ, তাহার পরে ধনুকভাঙা পণ, কাজেই বাপ কেবলই সবুর করিতেছেন কিন্তু মেয়ের বয়স সবুর করিতেছে না।
+      <br><br>
+      যাই হোক, হরিশের সরস রসনার গুণ আছে। মামার মন নরম হইল। বিবাহের ভূমিকা-অংশটা নির্বিঘ্নে সমাধা হইয়া গেল। কলিকাতার বাহিরে বাকি যে পৃথিবীটা আছে সমস্তটাকেই মামা আণ্ডামান দ্বীপের অন্তর্গত বলিয়া জানেন। জীবনে একবার বিশেষ কাজে তিনি কোন্নগর পর্যন্ত গিয়াছিলেন। মামা যদি মনু হইতেন তবে তিনি হাবড়ার পুল বার হওয়াটাকে তাঁহার সংহিতায় একেবারে নিষেধ করিয়া দিতেন। মনের মধ্যে ইচ্ছা ছিল, নিজের চোখে মেয়ে দেখিয়া আসিব। সাহস করিয়া প্রস্তাব করিতে পারিলাম না।
+      <br><br>
+      কন্যাকে আশীর্বাদ করিবার জন্য যাহাকে পাঠানো হইল সে আমাদের বিনুদাদা, আমার পিস্‌তুতো ভাই। তাহার মত, রুচি এবং দক্ষতার 'পরে আমি ষোল-আনা নির্ভর করিতে পারি। বিনুদা ফিরিয়া আসিয়া বলিলেন, 'মন্দ নয় হে! খাঁটি সোনা বটে।'
+      <br><br>
+      বিনুদাদার ভাষাটা অত্যন্ত আঁট। যেখানে আমরা বলি 'চমৎকার', সেখানে তিনি বলেন 'চলনসই'। অতএব বুঝিলাম, আমরা ভাগ্যে প্রজাপতির সঙ্গে পঞ্চশরের কোনো বিরোধ নাই।
+    </p>
+    
+  </div>
+  
+  
+  
+  
+  <div class="dream-veil"></div>
+  <div class="moon-glow"></div>
+  
+  <!-- CSS fireflies -->
+  <div class="firefly-layer" id="fireflyLayer"></div>
+  
+  <!-- CSS dust motes -->
+  <div class="mote-layer" id="moteLayer"></div>
+  
+  <script>
+    // ── FIREFLIES ─────────────────────────────────────────────────────
+    const palette = [
+      '#CBCBB5', '#CBCBB5', '#FFE9A9', '#FFE9A9'
+    ];
+    
+    const fireflyLayer = document.getElementById('fireflyLayer');
+    
+    for (let i = 0; i < 100; i++) {
+      const el = document.createElement('div');
+      el.className = 'firefly';
+      
+      const x = (Math.random() * 100).toFixed(2) + '%';
+      const y = (Math.random() * 100).toFixed(2) + '%';
+      const color = palette[Math.floor(Math.random() * palette.length)];
+      const blinkDur = (1 + Math.random() * 2).toFixed(2) + 's';
+      const blinkDel = (Math.random() * 4).toFixed(2) + 's';
+      const driftDur = (15 + Math.random() * 20).toFixed(1) + 's';
+      const driftDel = (Math.random() * 10).toFixed(2) + 's';
+      const maxAlpha = (0.5 + Math.random() * 0.5).toFixed(2);
+      
+      // Small random drift offsets so each firefly wanders differently
+      const dx1 = ((Math.random() - 0.5) * 30).toFixed(1) + 'px';
+      const dy1 = ((Math.random() - 0.5) * 30).toFixed(1) + 'px';
+      const dx2 = ((Math.random() - 0.5) * 30).toFixed(1) + 'px';
+      const dy2 = ((Math.random() - 0.5) * 30).toFixed(1) + 'px';
+      const dx3 = ((Math.random() - 0.5) * 30).toFixed(1) + 'px';
+      const dy3 = ((Math.random() - 0.5) * 30).toFixed(1) + 'px';
+      
+      el.style.cssText = `
+        left: ${x}; top: ${y};
+        background: ${color};
+        --blink-dur: ${blinkDur}; --blink-delay: ${blinkDel};
+        --drift-dur: ${driftDur}; --drift-delay: ${driftDel};
+        --max-alpha: ${maxAlpha};
+        --dx1:${dx1}; --dy1:${dy1};
+        --dx2:${dx2}; --dy2:${dy2};
+        --dx3:${dx3}; --dy3:${dy3};
+      `;
+      
+      fireflyLayer.appendChild(el);
+    }
+    
+    // ── DUST MOTES ────────────────────────────────────────────────────
+    const moteLayer = document.getElementById('moteLayer');
+    
+    for (let i = 0; i < 50; i++) {
+      const el = document.createElement('div');
+      el.className = 'mote';
+      
+      const x = (Math.random() * 100).toFixed(2) + '%';
+      const y = (20 + Math.random() * 80).toFixed(2) + '%'; // start scattered
+      const size = (1 + Math.random() * 2.4).toFixed(1) + 'px';
+      const riseDur = (12 + Math.random() * 20).toFixed(1) + 's';
+      const riseDel = (Math.random() * 15).toFixed(2) + 's';
+      const swayDur = (3 + Math.random() * 5).toFixed(1) + 's';
+      const swayDel = (Math.random() * 3).toFixed(2) + 's';
+      const swayAmp = ((Math.random() - 0.5) * 14).toFixed(1) + 'px';
+      const fadeDur = (2 + Math.random() * 4).toFixed(1) + 's';
+      const fadeDel = (Math.random() * 3).toFixed(2) + 's';
+      const baseAlpha = (0.1 + Math.random() * 0.15).toFixed(2);
+      const maxAlpha = (parseFloat(baseAlpha) + 0.1 + Math.random() * 0.15).toFixed(2);
+      const riseDist = (50 + Math.random() * 80).toFixed(0) + 'vh';
+      
+      el.style.cssText = `
+        left: ${x}; top: ${y};
+        width: ${size}; height: ${size};
+        --base-alpha: ${baseAlpha};
+        --max-alpha: ${maxAlpha};
+        --rise-dur: ${riseDur}; --rise-delay: ${riseDel};
+        --sway-dur: ${swayDur}; --sway-delay: ${swayDel}; --sway-amp: ${swayAmp};
+        --fade-dur: ${fadeDur}; --fade-delay: ${fadeDel};
+        --rise-dist: ${riseDist};
+      `;
+      
+      moteLayer.appendChild(el);
+    }
+    
+    
+    
+    // ── FIRE / MOTES (unchanged part omitted for brevity) ──
+    // keep your firefly + mote generation code as-is above this section
+    // ─────────────────────────────────────────────
+    // CHARACTER + SPRITE ENGINE STATE
+    // ─────────────────────────────────────────────
+    
+    let character = "kallani";
+    let i = 0;
+    
+    const img = document.getElementById("char_img_left");
+    
+    let timer = null;
+    let switching = false;
+    let y = 0;
+    
+    
+    // ─────────────────────────────────────────────
+    // SPRITE ANIMATION LOOP (FIXED)
+    // ─────────────────────────────────────────────
+    
+    function play() {
+      const sequence = [
+        { src: `/characters/${character}/a.png`, time: 2000 },
+        { src: `/characters/${character}/b.png`, time: 150 },
+        { src: `/characters/${character}/c.png`, time: 150 },
+        { src: `/characters/${character}/b.png`, time: 150 }
+      ];
+      
+      img.src = sequence[i].src;
+      
+      const delay = sequence[i].time;
+      
+      i = (i + 1) % sequence.length;
+      
+      timer = setTimeout(play, delay);
+    }
+    
+    function restartAnimation() {
+      clearTimeout(timer);
+      i = 0;
+      play();
+    }
+    
+    
+    // start animation
+    play();
+    
+    
+    // ─────────────────────────────────────────────
+    // SMOOTH CHARACTER SWITCH (EXIT → SWAP → ENTER)
+    // ─────────────────────────────────────────────
+    let xxx = document.getElementById('char_msg_a')
+    
+    function toggleImg(el, src) {
+      if (switching) return;
+      switching = true;
+      
+      const imgEl = document.getElementById("char_img_left");
+      
+      // send character OUT
+      imgEl.classList.remove("show");
+      xxx.classList.remove("show");
+      
+      // wait for exit animation
+      setTimeout(() => {
+        
+        // swap character ONLY after exit
+        character = src;
+        
+        // restart sprite animation
+        restartAnimation();
+        //
+        if (src == "rabindranath_tagore") {
+          xxx.innerHTML = `<div>আমার নাম রবীন্দ্রনাথ ঠাকুর।আমার জন্ম ১৮৬১ খ্রিষ্টাব্দের ৭ই মে(১২৬৮ বঙ্গাব্দের ২৫শে বৈশাখ) কলকাতার জোড়াসাকোর ঠাকুর পরিবারে। আমার পিতা দেবেন্দ্রনাথ ঠাকুর,  মাতা সারদা দেবী। বিশ্বকবি অভিধায় সম্ভাষিত আমি।
+আমিই বাংলা সাহিত্যের প্রথম সার্থক ছোটগল্প রচয়িতা এবং বাংলা ছােটগল্পের শ্রেষ্ঠ শিল্পী। আমার লেখনীতেই বাংলা
+ছােটগল্পের উদ্ভব, বিকাশ ও সমৃদ্ধি ঘটেছে। বলা হয়ে থাকে আমার ছােটগল্প বিশ্বসাহিত্যের শ্রেষ্ঠ ছোটগল্পগুলাের সমতুল্য। ১২৮৪
+বঙ্গাব্দে মাত্র ষােল বছর বয়সে "ভিখারিনী" গল্প রচনার মাধ্যমে ছােটগল্প লেখক হিসেবে আমার আত্মপ্রকাশ ঘটে।
+এর পর থেকে জীবনের প্রায় শেষ দিন পর্যন্ত দীর্ঘ ছৌষট্টি বছরে আমি অখণ্ড 'গল্পগুচ্ছে' সংকলিত ৯৫টি ছোটগল্প
+রচনা করেছি। এর বাইরে 'সে', 'গল্পসল্প' এবং 'লিপিকা' গ্রন্থে আমার আরও গল্প সংকলিত হয়েছে।
+আমার রচিত সর্বশেষ গল্পটির নাম 'মুসলমানীর গল্প'।
+পারিবারিক জমিদারি তদারকির সূত্রে কুষ্টিয়ার শিলাইদহে বসবাসের কালপর্বই আমার ছােটগল্প রচনার স্বর্ণযূগ।
+'সোনার তরী' কাব্যের শ্রেষ্ঠ কবিতাগুলোও আমি একই সময়ে রচনা করেছি। প্রকৃতির পটে জীবনকে স্থাপন করে
+জীবনের গীতময় বিশ্বজনীন প্রকাশই আমার গল্পের শ্রেষ্ঠ সম্পদ। তবে বিশ শতকে রচিত গল্পে প্রকৃতি ও গীতময়তার
+স্থলে আমি বাস্তবতাই প্রাধান্য দিয়েছি। গল্পকার হিসেবে আমি যেমন বরেণ্য, ঔপন্যাসিক হিসেবেও বাংলা সাহিত্যে আমার
+স্থান সুনির্দিষ্ট । আমার রচিত উপন্যাসগুলোর মধ্যে 'চোখের বালি','গােরা', 'চতুরঙ্গ','ঘরে-বাইরে','শেষের কবিতা',
+'যােগাযােগ' বাংলা উপন্যাসের শ্রেষ্ঠ নিদর্শন হিসেবে ধরা হয়। নাটক রচনার ক্ষেত্রেও আমার শ্রেষ্ঠত্ব অবিসংবাদিত। আমার রচিত
+নাটকগুলাের মধ্যে বিশেষভাবে উল্লেখযাগ্য হলো : 'রাজা', 'আচলায়তন','ডাকঘর', 'মুক্তধারা' , 'রক্তকরবী'।
+১৯৪১ খ্রিষ্টব্দের ৭ই আগস্ট (১৩৪৮ বঙ্গাব্দের ২২শে শ্রাবণ) জোড়াসাঁকোর ঠাকুরবাড়িতে আমার জীবনাবসান ঘটে।</div>`;
+        } else if (src == "anupom") {
+          xxx.innerHTML = "<div>hello</div>"
+        }
+        // bring new character IN
+        imgEl.classList.add("show");
+        xxx.classList.add("show");
+        switching = false;
+        
+      }, 500); // must match CSS transition duration
+    }
+    
+    ////audio player
+    
+    
+    const audio = document.getElementById('audio');
+    // const fileInput  = document.getElementById('fileInput');
+    //const fileName   = document.getElementById('fileName');
+    const island = document.getElementById('island');
+    const playBtn = document.getElementById('playBtn');
+    const playIcon = document.getElementById('playIcon');
+    const fill = document.getElementById('fill');
+    const prog = document.getElementById('prog');
+    const expandBtn = document.getElementById('expandBtn');
+    //  const trackTitle = document.getElementById('trackTitle');
+    const timeCurrent = document.getElementById('timeCurrent');
+    const timeTotal = document.getElementById('timeTotal');
+    const lines = document.querySelectorAll('.lyric-line');
+    
+    const PLAY = 'M8 5v14l11-7z';
+    const PAUSE = 'M6 19h4V5H6v14zm8-14v14h4V5h-4z';
+    
+    function fmt(s) {
+      if (!s || isNaN(s)) return '0:00';
+      return `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+    }
+    
+    
+    // Duration ready
+    audio.addEventListener('loadedmetadata', () => {
+      timeTotal.textContent = fmt(audio.duration);
+    });
+    
+    // Play / pause
+    playBtn.addEventListener('click', () => {
+      if (!audio.src) return;
+      if (audio.paused) {
+        audio.play();
+        playIcon.querySelector('path').setAttribute('d', PAUSE);
+      } else {
+        audio.pause();
+        playIcon.querySelector('path').setAttribute('d', PLAY);
+      }
+    });
+    
+    audio.addEventListener('ended', () => {
+      playIcon.querySelector('path').setAttribute('d', PLAY);
+    });
+    
+    // Sync progress bar & time
+    
+    audio.addEventListener('timeupdate', () => {
+      if (!audio.duration) return;
+      const pct = (audio.currentTime / audio.duration) * 100;
+      fill.style.width = pct + '%';
+      timeCurrent.textContent = fmt(audio.currentTime);
+      
+      // Sync lyric highlight
+      const idx = Math.floor((pct / 100) * lines.length);
+      lines.forEach((l, i) => {
+        l.classList.remove('active', 'past');
+        if (i < idx) l.classList.add('past');
+        else if (i === idx) l.classList.add('active');
+      });
+    });
+   
+   /*
+    audio.addEventListener('timeupdate', () => {
+      if (!audio.duration) return;
+      
+      const current = audio.currentTime;
+      
+      let activeIndex = -1;
+      
+      lines.forEach((line, i) => {
+        const t = parseFloat(line.dataset.time);
+        
+        if (current >= t) {
+          activeIndex = i;
+        }
+      });
+      
+      lines.forEach((line, i) => {
+        line.classList.remove('active', 'past');
+        
+        if (i < activeIndex) line.classList.add('past');
+        if (i === activeIndex) line.classList.add('active');
+      });
+    });
+    
+    */
+    
+    // Seek on click
+    prog.addEventListener('click', e => {
+      if (!audio.duration) return;
+      const r = prog.getBoundingClientRect();
+      audio.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * audio.duration;
+    });
+    
+    // Expand
+    expandBtn.addEventListener('click', () => island.classList.toggle('expanded'));
+    
+    
+    
+    document.addEventListener("click", (e) => {
+      
+      
+      audio.play();
+      playIcon.querySelector('path').setAttribute('d', PAUSE);
+      
+      
+      
+    }, { once: true });
+  </script>
+</body>
+
+</html>
