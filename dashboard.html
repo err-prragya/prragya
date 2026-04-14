@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>EduSpark</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'nor';
+      src: url('nor.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    
+    @font-face {
+      font-family: 'itl';
+      src: url('itl.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    
+    
+    
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    :root {
+      --lime: #C9F23A;
+      --dark: #111111;
+      --purple: #7C5CFC;
+      --teal: #00D4AA;
+      --orange: #FF8C42;
+      --bg: #F7F7F5;
+      --white: #FFFFFF;
+      --muted: #9a9a9a;
+      --r: 18px;
+      --rs: 12px;
+    }
+    
+    html,
+    body {
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background: var(--bg);
+      
+      color: var(--dark);
+    }
+    
+    .app {
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    /* ─── STATUS BAR ─── */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px 2px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: #666;
+      flex-shrink: 0;
+    }
+    
+    /* ─── HEADER ─── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 18px 8px;
+      flex-shrink: 0;
+    }
+    
+    .hd-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .av {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple), var(--teal));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+      color: white;
+      border: 2.5px solid var(--lime);
+      flex-shrink: 0;
+    }
+    
+    .hi-greeting {
+      font-size: 0.63rem;
+      color: var(--muted);
+    }
+    
+    .hi-name {
+     
+      font-weight: 800;
+      font-size: 1rem;
+    }
+    
+    .hd-right {
+      display: flex;
+      gap: 7px;
+    }
+    
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--white);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+      position: relative;
+    }
+    
+    .ndot {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #FF4757;
+      border: 1.5px solid var(--bg);
+    }
+    
+    /* ─── SCROLL AREA ─── */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 0 14px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    
+    .content::-webkit-scrollbar {
+      display: none;
+    }
+    
+    /* ─── XP BANNER ─── */
+    .xp-banner {
+      background: var(--dark);
+      border-radius: var(--r);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+    
+    .xp-l {
+      flex: 1;
+    }
+    
+    .xp-title {
+     
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: white;
+    }
+    
+    .xp-sub {
+      font-size: 0.62rem;
+      color: #666;
+      margin-top: 1px;
+    }
+    
+    .xp-track {
+      height: 6px;
+      background: #2a2a2a;
+      border-radius: 10px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    
+    .xp-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--purple), var(--lime));
+      border-radius: 10px;
+      transition: width 1.5s ease;
+    }
+    
+    .streak-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(201, 242, 58, 0.1);
+      border: 1px solid rgba(201, 242, 58, 0.25);
+      border-radius: 20px;
+      padding: 3px 10px;
+      margin-top: 7px;
+      font-size: 0.62rem;
+      font-weight: 600;
+      color: var(--lime);
+    }
+    
+    .xp-r {
+      text-align: right;
+      flex-shrink: 0;
+    }
+    
+    .xp-pts {
+      
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--lime);
+      line-height: 1;
+    }
+    
+    .xp-unit {
+      font-size: 0.58rem;
+      color: #555;
+      margin-top: 2px;
+    }
+    
+    /* ─── SECTION LABEL ─── */
+    .slabel {
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      padding: 0 2px;
+      flex-shrink: 0;
+    }
+    
+    /* ─── FEATURE CARDS ─── */
+    .feat-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    
+    .feat {
+      border-radius: var(--r);
+      padding: 11px 9px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: transform 0.15s;
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 0.82;
+    }
+    
+    .feat:active {
+      transform: scale(0.93);
+    }
+    
+    .f1 {
+      background: var(--dark);
+    }
+    
+    .f2 {
+      background: #EEE8FF;
+    }
+    
+    .f3 {
+      background: var(--lime);
+    }
+    
+    .f4 {
+      background: linear-gradient(145deg, #16103a, #0f0f1e);
+    }
+    
+    .feat-icon {
+      font-size: 1.25rem;
+    }
+    
+    .feat-name {
+      
+      font-weight: 700;
+      font-size: 0.6rem;
+      line-height: 1.25;
+      margin-top: 4px;
+    }
+    
+    .f1 .feat-name {
+      color: white;
+    }
+    
+    .f2 .feat-name {
+      color: var(--purple);
+    }
+    
+    .f3 .feat-name {
+      color: #2d3a00;
+    }
+    
+    .f4 .feat-name {
+      color: white;
+    }
+    
+    .feat-cnt {
+      font-size: 0.52rem;
+      margin-top: 1px;
+    }
+    
+    .f1 .feat-cnt {
+      color: #555;
+    }
+    
+    .f2 .feat-cnt {
+      color: #9a8abf;
+    }
+    
+    .f3 .feat-cnt {
+      color: #6b7a10;
+    }
+    
+    .f4 .feat-cnt {
+      color: #4455aa;
+    }
+    
+    .feat-badge {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      background: var(--lime);
+      color: #111;
+      font-size: 0.42rem;
+      font-weight: 800;
+      padding: 2px 5px;
+      border-radius: 5px;
+    }
+    
+    .f4 .feat-badge {
+      background: var(--lime);
+      color: #111;
+    }
+    
+    /* ─── 2-COL BENTO ─── */
+    .bento {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    
+    .card {
+      background: var(--white);
+      border-radius: var(--r);
+      padding: 14px;
+    }
+    
+    .ct {
+      
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+    
+    .cs {
+      font-size: 0.6rem;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+    
+    /* Chart card */
+    .chart-card {
+      grid-column: span 2;
+    }
+    
+    .chart-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    
+    .week-pill {
+      background: #f0f0f0;
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 0.6rem;
+      color: #555;
+    }
+    
+    .bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 5px;
+      height: 56px;
+      margin-top: 10px;
+    }
+    
+    .bc {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+    
+    .b {
+      width: 100%;
+      border-radius: 5px 5px 0 0;
+    }
+    
+    .bd {
+      background: var(--dark);
+    }
+    
+    .bl {
+      background: var(--lime);
+    }
+    
+    .bs {
+      background: #e8e8e8;
+    }
+    
+    .bd-lbl {
+      font-size: 0.52rem;
+      color: var(--muted);
+    }
+    
+    .chart-stats {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #f0f0f0;
+    }
+    
+    .cst-num {
+  
+      font-weight: 800;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+    
+    .cst-lbl {
+      font-size: 0.55rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 1px;
+    }
+    
+    /* Subjects card */
+    .sub-card {
+      background: var(--dark);
+    }
+    
+    .sub-card .ct {
+      color: white;
+    }
+    
+    .sub-card .cs {
+      color: #555;
+    }
+    
+    .sub-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    
+    .si {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    
+    .sn {
+      font-size: 0.65rem;
+      color: #ccc;
+      font-weight: 500;
+    }
+    
+    .sp {
+      font-size: 0.6rem;
+      color: #666;
+    }
+    
+    .pbr {
+      height: 5px;
+      background: #2a2a2a;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .pf {
+      height: 100%;
+      border-radius: 10px;
+    }
+    
+    /* Stat lime card */
+    .stat-card {
+      background: var(--lime);
+    }
+    
+    .stat-big {
+    
+      font-weight: 800;
+      font-size: 2.1rem;
+      color: var(--dark);
+      line-height: 1;
+      margin: 6px 0 3px;
+    }
+    
+    .stat-desc {
+      font-size: 0.6rem;
+      color: #4a5a00;
+    }
+    
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: rgba(0, 0, 0, 0.09);
+      border-radius: 20px;
+      padding: 3px 8px;
+      font-size: 0.58rem;
+      font-weight: 700;
+      color: #3a4a00;
+      margin-top: 7px;
+    }
+    
+    /* AI card */
+    .ai-full {
+      grid-column: span 2;
+      background: linear-gradient(135deg, #180a38, #0d0d1e);
+    }
+    
+    .ai-full .ct {
+      color: white;
+    }
+    
+    .ai-glow {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      background: var(--lime);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+      animation: gp 2.5s infinite;
+    }
+    
+    @keyframes gp {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(201, 242, 58, .45)
+      }
+      
+      50% {
+        box-shadow: 0 0 0 9px rgba(201, 242, 58, 0)
+      }
+    }
+    
+    .ai-sub {
+      font-size: 0.6rem;
+      color: #7755cc;
+      margin-top: 1px;
+    }
+    
+    .ai-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 9px;
+    }
+    
+    .ai-chip {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #aaa;
+      font-size: 0.55rem;
+      padding: 3px 9px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    
+    /* ─── EXAM TIMELINE (horizontal scroll) ─── */
+    .exam-scroll-wrap {
+      overflow-x: auto;
+      margin: 0 -14px;
+      padding: 0 14px 2px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      flex-shrink: 0;
+    }
+    
+    .exam-scroll-wrap::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .exam-row {
+      display: flex;
+      gap: 8px;
+      min-width: max-content;
+    }
+    
+    .etile {
+      width: 136px;
+      border-radius: var(--rs);
+      padding: 12px;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    
+    .etile:active {
+      transform: scale(0.96);
+    }
+    
+    .e-r {
+      background: #FFF0F0;
+      border-left: 3px solid #FF4757;
+    }
+    
+    .e-y {
+      background: #FFFBEE;
+      border-left: 3px solid #FFB300;
+    }
+    
+    .e-g {
+      background: #EFFFF9;
+      border-left: 3px solid var(--teal);
+    }
+    
+    .e-p {
+      background: #F3F0FF;
+      border-left: 3px solid var(--purple);
+    }
+    
+    .e-subj {
+      font-weight: 700;
+      font-size: 0.71rem;
+      line-height: 1.3;
+    }
+    
+    .e-date {
+      font-size: 0.58rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    
+    .e-tag {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 0.56rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    
+    .tr {
+      background: #FFD7DA;
+      color: #B00020;
+    }
+    
+    .ty {
+      background: #FFE98A;
+      color: #7A5200;
+    }
+    
+    .tg {
+      background: #C3F7E5;
+      color: #005C3B;
+    }
+    
+    .tp {
+      background: #E0D8FF;
+      color: #4A00C8;
+    }
+    
+    /* ─── LEADERBOARD ─── */
+    .lb-card {
+      background: var(--dark);
+      grid-column: span 2;
+    }
+    
+    .lb-card .ct {
+      color: white;
+    }
+    
+    .lb-card .cs {
+      color: #555;
+    }
+    
+    .lb-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .lb-more {
+      font-size: 0.6rem;
+      color: var(--purple);
+      font-weight: 600;
+    }
+    
+    .lb-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    
+    .lb-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 10px;
+      border-radius: var(--rs);
+    }
+    
+    .lb-row.me {
+      background: rgba(201, 242, 58, 0.1);
+      border: 1px solid rgba(201, 242, 58, 0.2);
+    }
+    
+    .lrk {
+      width: 17px;
+      font-weight: 800;
+      font-size: 0.78rem;
+      text-align: center;
+    }
+    
+    .r1 {
+      color: #FFD700;
+    }
+    
+    .r2 {
+      color: #C0C0C0;
+    }
+    
+    .r3 {
+      color: #CD7F32;
+    }
+    
+    .rx {
+      color: var(--lime);
+    }
+    
+    .rn {
+      color: #444;
+    }
+    
+    .lav {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+    
+    .lname {
+      flex: 1;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #ddd;
+    }
+    
+    .lb-row.me .lname {
+      color: var(--lime);
+    }
+    
+    .lscore {
+      display: block;
+      font-size: 0.56rem;
+      color: #555;
+    }
+    
+    .lpts {
+           font-size: 0.77rem;
+      font-weight: 800;
+      color: var(--lime);
+    }
+    
+    /* ─── BOTTOM NAV ─── */
+    .bottom-nav {
+      display: flex;
+      background: var(--white);
+      border-radius: 22px 22px 0 0;
+      padding: 8px 4px calc(env(safe-area-inset-bottom, 0px) + 8px);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+      flex-shrink: 0;
+    }
+    
+    .ntab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      padding: 6px 4px;
+      border-radius: 14px;
+      transition: background 0.15s;
+      position: relative;
+    }
+    
+    .ntab.active {
+      background: var(--dark);
+    }
+    
+    .ntab-ic {
+      font-size: 1.05rem;
+    }
+    
+    .ntab-lb {
+      font-size: 0.52rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    
+    .ntab.active .ntab-lb {
+      color: var(--lime);
+    }
+    
+    .nbadge {
+      position: absolute;
+      top: 2px;
+      right: calc(50% - 16px);
+      background: #FF4757;
+      color: white;
+      font-size: 0.42rem;
+      font-weight: 800;
+      min-width: 13px;
+      height: 13px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid var(--bg);
+    }
+    
+    /* Fade-up entrance */
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .header {
+      animation: rise 0.35s ease both;
+    }
+    
+    .content>* {
+      animation: rise 0.4s ease both;
+    }
+    
+    .content>*:nth-child(1) {
+      animation-delay: .05s
+    }
+    
+    .content>*:nth-child(2) {
+      animation-delay: .09s
+    }
+    
+    .content>*:nth-child(3) {
+      animation-delay: .12s
+    }
+    
+    .content>*:nth-child(4) {
+      animation-delay: .15s
+    }
+    
+    .content>*:nth-child(5) {
+      animation-delay: .18s
+    }
+    
+    .content>*:nth-child(6) {
+      animation-delay: .21s
+    }
+    
+    .content>*:nth-child(7) {
+      animation-delay: .24s
+    }
+    
+    .content>*:nth-child(8) {
+      animation-delay: .27s
+    }
+    
+    .content>*:nth-child(9) {
+      animation-delay: .30s
+    }
+    
+    
+    * {
+      font-family: "nor";
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span>9:41</span>
+      <span>●●● WiFi 🔋</span>
+    </div>
+    
+    <!-- Header -->
+    <div class="header">
+      <div class="hd-left">
+        <div class="av">A</div>
+        <div>
+          <div class="hi-greeting">Good morning 👋</div>
+          <div class="hi-name">Aiden Holloway</div>
+        </div>
+      </div>
+      <div class="hd-right">
+        <button class="icon-btn">🔍</button>
+        <button class="icon-btn">🔔<div class="ndot"></div></button>
+      </div>
+    </div>
+    
+    <!-- Content -->
+    <div class="content">
+      
+      <!-- XP Banner -->
+      <div class="xp-banner">
+        <div class="xp-l">
+          <div class="xp-title">Level 14 Learner</div>
+          <div class="xp-sub">680 XP until Level 15</div>
+          <div class="xp-track">
+            <div class="xp-fill" id="xpFill"></div>
+          </div>
+          <div class="streak-pill">🔥 21-day streak active</div>
+        </div>
+        <div class="xp-r">
+          <div class="xp-pts">6,820</div>
+          <div class="xp-unit">Total XP</div>
+        </div>
+      </div>
+      
+      <!-- Quick Access -->
+      <div class="slabel">Quick Access</div>
+      <div class="feat-row">
+        <div class="feat f1">
+          <div class="feat-badge">NEW</div>
+          <div class="feat-icon">📗</div>
+          <div>
+            <div class="feat-name">Digital Library</div>
+            <div class="feat-cnt">450+ books</div>
+          </div>
+        </div>
+        <div class="feat f2">
+          <div class="feat-icon">❓</div>
+          <div>
+            <div class="feat-name">Question Bank</div>
+            <div class="feat-cnt">12k+ Qs</div>
+          </div>
+        </div>
+        <div class="feat f3">
+          <div class="feat-icon">🔬</div>
+          <div>
+            <div class="feat-name">Simulations</div>
+            <div class="feat-cnt">28 labs</div>
+          </div>
+        </div>
+        <div class="feat f4">
+          <div class="feat-badge">AI</div>
+          <div class="feat-icon">🤖</div>
+          <div>
+            <div class="feat-name">AI Tutor</div>
+            <div class="feat-cnt">Live now</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Study Chart + Subjects -->
+      <div class="bento">
+        
+        <div class="card chart-card">
+          <div class="chart-top">
+            <div>
+              <div class="ct">Study Hours</div>
+              <div class="cs">This week · 24.5 hrs</div>
+            </div>
+            <div class="week-pill">Week ▾</div>
+          </div>
+          <div class="bars">
+            <div class="bc">
+              <div class="b bd" style="height:43px"></div>
+              <div class="bd-lbl">M</div>
+            </div>
+            <div class="bc">
+              <div class="b bl" style="height:54px"></div>
+              <div class="bd-lbl">T</div>
+            </div>
+            <div class="bc">
+              <div class="b bd" style="height:34px"></div>
+              <div class="bd-lbl">W</div>
+            </div>
+            <div class="bc">
+              <div class="b bl" style="height:56px"></div>
+              <div class="bd-lbl">T</div>
+            </div>
+            <div class="bc">
+              <div class="b bs" style="height:24px"></div>
+              <div class="bd-lbl">F</div>
+            </div>
+            <div class="bc">
+              <div class="b bl" style="height:46px"></div>
+              <div class="bd-lbl">S</div>
+            </div>
+            <div class="bc">
+              <div class="b bs" style="height:16px"></div>
+              <div class="bd-lbl">S</div>
+            </div>
+          </div>
+          <div class="chart-stats">
+            <div>
+              <div class="cst-num">24.5h</div>
+              <div class="cst-lbl">Study</div>
+            </div>
+            <div>
+              <div class="cst-num" style="color:var(--purple)">92%</div>
+              <div class="cst-lbl">Accuracy</div>
+            </div>
+            <div>
+              <div class="cst-num" style="color:var(--teal)">318</div>
+              <div class="cst-lbl">Qs Done</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card sub-card">
+          <div class="ct">Subjects</div>
+          <div class="cs">Semester 2</div>
+          <div class="sub-list">
+            <div>
+              <div class="si"><span class="sn">Physics</span><span class="sp">82%</span></div>
+              <div class="pbr">
+                <div class="pf" style="width:82%;background:var(--lime)"></div>
+              </div>
+            </div>
+            <div>
+              <div class="si"><span class="sn">Math</span><span class="sp">75%</span></div>
+              <div class="pbr">
+                <div class="pf" style="width:75%;background:var(--purple)"></div>
+              </div>
+            </div>
+            <div>
+              <div class="si"><span class="sn">Chemistry</span><span class="sp">61%</span></div>
+              <div class="pbr">
+                <div class="pf" style="width:61%;background:var(--teal)"></div>
+              </div>
+            </div>
+            <div>
+              <div class="si"><span class="sn">Biology</span><span class="sp">90%</span></div>
+              <div class="pbr">
+                <div class="pf" style="width:90%;background:var(--orange)"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card stat-card">
+          <div class="ct">🏅 Best Record</div>
+          <div class="stat-big">645h</div>
+          <div class="stat-desc">Study time this semester</div>
+          <div class="stat-pill">↑ 12% vs last month</div>
+        </div>
+        
+        <div class="card ai-full">
+          <div class="ai-glow">🤖</div>
+          <div class="ct">Spark AI Tutor</div>
+          <div class="ai-sub">● Online — ask me anything</div>
+          <div class="ai-chips">
+            <div class="ai-chip">Explain topic</div>
+            <div class="ai-chip">Practice quiz</div>
+            <div class="ai-chip">Solve equation</div>
+            <div class="ai-chip">Summarize</div>
+          </div>
+        </div>
+        
+      </div>
+      
+      <!-- Upcoming Exams -->
+      <div class="slabel">Upcoming Exams</div>
+      <div class="exam-scroll-wrap">
+        <div class="exam-row">
+          <div class="etile e-r">
+            <div class="e-subj">Physics Final Exam</div>
+            <div class="e-date">📅 Apr 18, 2026</div>
+            <div class="e-tag tr">4 days left</div>
+          </div>
+          <div class="etile e-y">
+            <div class="e-subj">Math · Calculus Test</div>
+            <div class="e-date">📅 Apr 24, 2026</div>
+            <div class="e-tag ty">10 days left</div>
+          </div>
+          <div class="etile e-g">
+            <div class="e-subj">Chemistry Practical</div>
+            <div class="e-date">📅 May 2, 2026</div>
+            <div class="e-tag tg">18 days left</div>
+          </div>
+          <div class="etile e-p">
+            <div class="e-subj">Biology Half-Yearly</div>
+            <div class="e-date">📅 May 10, 2026</div>
+            <div class="e-tag tp">26 days left</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Leaderboard -->
+      <div class="slabel">🏆 Class Leaderboard</div>
+      <div class="bento">
+        <div class="card lb-card">
+          <div class="lb-head">
+            <div>
+              <div class="ct">Top Learners</div>
+              <div class="cs">Weekly · Your class</div>
+            </div>
+            <span class="lb-more">View all →</span>
+          </div>
+          <div class="lb-list">
+            <div class="lb-row">
+              <div class="lrk r1">1</div>
+              <div class="lav" style="background:linear-gradient(135deg,#f093fb,#f5576c)">S</div>
+              <div style="flex:1">
+                <div class="lname">Samira K.</div><span class="lscore">98% accuracy</span>
+              </div>
+              <div class="lpts">9,820</div>
+            </div>
+            <div class="lb-row">
+              <div class="lrk r2">2</div>
+              <div class="lav" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">R</div>
+              <div style="flex:1">
+                <div class="lname">Rohan M.</div><span class="lscore">95% accuracy</span>
+              </div>
+              <div class="lpts">9,450</div>
+            </div>
+            <div class="lb-row">
+              <div class="lrk r3">3</div>
+              <div class="lav" style="background:linear-gradient(135deg,#fa709a,#fee140)">P</div>
+              <div style="flex:1">
+                <div class="lname">Priya V.</div><span class="lscore">94% accuracy</span>
+              </div>
+              <div class="lpts">9,210</div>
+            </div>
+            <div class="lb-row me">
+              <div class="lrk rx">5</div>
+              <div class="lav" style="background:linear-gradient(135deg,var(--purple),var(--teal))">A</div>
+              <div style="flex:1">
+                <div class="lname">You (Aiden)</div><span class="lscore">91% accuracy</span>
+              </div>
+              <div class="lpts">8,820</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="height:6px;flex-shrink:0"></div>
+      
+    </div><!-- /content -->
+    
+    <!-- Bottom Nav -->
+    <div class="bottom-nav">
+      <button class="ntab active">
+        <div class="ntab-ic">🏠</div>
+        <div class="ntab-lb">Home</div>
+      </button>
+      <button class="ntab" style="position:relative">
+        <div class="ntab-ic">📖</div>
+        <div class="ntab-lb">Courses</div>
+        <div class="nbadge">6</div>
+      </button>
+      <button class="ntab" style="position:relative">
+        <div class="ntab-ic">✅</div>
+        <div class="ntab-lb">Tasks</div>
+        <div class="nbadge">3</div>
+      </button>
+      <button class="ntab">
+        <div class="ntab-ic">📊</div>
+        <div class="ntab-lb">Analytics</div>
+      </button>
+      <button class="ntab">
+        <div class="ntab-ic">👤</div>
+        <div class="ntab-lb">Profile</div>
+      </button>
+    </div>
+    
+  </div>
+  
+  <script>
+    // Animate XP bar on load
+    setTimeout(() => {
+      document.getElementById('xpFill').style.width = '68%';
+    }, 300);
+    
+    // Nav switching
+    document.querySelectorAll('.ntab').forEach(t => {
+      t.addEventListener('click', () => {
+        document.querySelectorAll('.ntab').forEach(x => x.classList.remove('active'));
+        t.classList.add('active');
+      });
+    });
+    
+    // Feature card ripple
+    document.querySelectorAll('.feat').forEach(f => {
+      f.addEventListener('click', () => {
+        f.style.opacity = '0.75';
+        setTimeout(() => { f.style.opacity = '1'; }, 180);
+      });
+    });
+  </script>
+</body>
+
+</html>
